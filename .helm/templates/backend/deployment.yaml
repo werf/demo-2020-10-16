@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-backend
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-backend
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-backend
+    spec:
+      containers:
+      - name: application
+        command: ["node","/app/app.js"]
+        image: {{ tuple "backend" . | include "werf_image" }}
+        workingDir: /app
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        env:
+        - name: "DEBUG"
+          value: "{{ .Values.isDebug }}"
