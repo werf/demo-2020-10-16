@@ -7,7 +7,7 @@ metadata:
   name: {{ .Chart.Name }}
 spec:
   rules:
-  - host: {{ .Values.app.hostname }}
+  - host: {{ pluck .Values.global.env .Values.app.hostnameByEnv | first }}
     http:
       paths:
       - path: /

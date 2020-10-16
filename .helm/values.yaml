@@ -3,3 +3,6 @@ app:
     _default: "true"
     production: "false"
     staging: "true"
+  hostnameByEnv:
+    production: production.werf-demo.distol.hf.flant.com
+    staging: staging.werf-demo.distol.hf.flant.com
