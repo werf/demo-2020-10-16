@@ -1,1 +1,5 @@
-isDebug: "true"
+app:
+  debugByEnv:
+    _default: "true"
+    production: "false"
+    staging: "true"

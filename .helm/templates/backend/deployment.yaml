@@ -26,4 +26,4 @@ spec:
           protocol: TCP
         env:
         - name: "DEBUG"
-          value: "{{ .Values.isDebug }}"
+          value: "{{ pluck .Values.global.env .Values.app.debugByEnv | first | default .Values.app.debugByEnv._default }}"
