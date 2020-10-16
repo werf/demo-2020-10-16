@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-frontend
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-frontend
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-frontend
+      annotations:
+        config/checksum: {{ include (print $.Template.BasePath "/frontend/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: nginx
+        image: {{ tuple "frontend" . | include "werf_image" }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/usr/sbin/nginx", "-s", "quit"]
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - name: env-json
+          mountPath: /www/config/env.json
+          subPath: env.json
+      volumes:
+      - name: env-json
+        configMap:
+          name: {{ .Chart.Name }}-frontend

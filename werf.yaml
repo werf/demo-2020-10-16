@@ -17,3 +17,36 @@ shell:
   - cd /app && npm ci
 docker:
   WORKDIR: /app
+---
+artifact: frontend-build
+from: node:14-stretch
+shell:
+  beforeInstall:
+    - apt update
+    - apt install -y build-essential tzdata locales
+  install:
+    - cd /app && npm i
+  setup:
+    - cd /app && npm run build
+git:
+  - add: /frontend
+    to: /app
+    stageDependencies:
+      install:
+        - package.json
+        - webpack-*
+      setup:
+        - "**/*"
+---
+image: frontend
+from: nginx:stable-alpine
+docker:
+  EXPOSE: '80'
+git:
+  - add: /frontend/nginx.conf
+    to: /etc/nginx/nginx.conf
+import:
+  - artifact: frontend-build
+    add: /app/dist
+    to: /www
+    after: setup
